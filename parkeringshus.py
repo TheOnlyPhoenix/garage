@@ -2,9 +2,10 @@ import sys
 import os
 import time
 import datetime as dt
+import platform
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from typed_input import input_type, input_file, size_input, license_input, exit_input
+from typed_input import *
 
 class Car():
     def __init__(self, license_num, size, owner, parked = False, park = "", exit = ""):
@@ -36,19 +37,22 @@ class Car():
         else:
             str_exit_time = ""
             current_timestamp = dt.datetime.now().isoformat()
-            current_time = (f"Current time: {current_timestamp} \n")
+            current_time = (f"Current time: {current_timestamp}\n")
             delta = relativedelta(parse(current_timestamp), parse(self.park_time))
             time_parked = (f"The car has been parked for {delta.years} year(s), {delta.months} months, {delta.days} days, {delta.hours} hours, {delta.minutes} minutes.")
 
-        return (str_license + str_size + str_own + str_parked + str_park_time + str_exit_time + current_time + time_parked)
+        return (str_license + str_size + str_own + str_parked + str_park_time + str_exit_time + current_time + time_parked + "\n")
 
 def write_history_file(garage):
-    parking_garage = garage
+    parking_garage = list(garage.values())
     filename = "garage.csv"
-
+    i = 0
     with open(filename, "w", encoding="utf-8") as file:
-        for bil in parking_garage.items():
-            file.write(str(bil))
+        for car in parking_garage:
+            lines = re.sub(r"[\([{})\]]", "", repr(car)).split("\n")
+            lines.pop()
+            lines.pop()
+            file.write(",".join(lines) + "\n")
 
         
 
@@ -57,7 +61,7 @@ def read_from_file():
 
 def park():
     license_num = license_input("Enter the license number of the car: ")
-    size = size_input("Enter the size of the car (1/2/3): ", str)
+    size = size_input("Enter the size of the car (1/2/3): ")
     owner = input_type("Enter the name of the owner of the car: ", str)
     
     park_timestamp = dt.datetime.now().isoformat()
@@ -78,22 +82,30 @@ def unpark(parked_cars, unparked_cars):
     return parking_list,unparked_list
     
 
-def append_to_list():    
+def append_to_list(parking_list):    
+    garage = parking_list
     car = park()
     num = car.license_num
-    garage = {}
     
     garage.update({num : car})
-    print(garage)
+
+    print(re.sub(r"[\([{})\]]", "", repr(garage.get(num))))
     return garage
 
-def menu():
+def clear_terminal():
+    if (platform.system() == "Linux"):
+        os.system('clear')
+    elif (platform.system() == "Windows"):
+        os.system('cls')
+
+def main():
     parking_garage = {}
     unparked_cars = {}
     
     print("Welcome to the parking garage! Please choose one of the options below")
     while True:
-        os.system('clear')
+        clear_terminal()
+        
         print("1. Enter the garage")
         print("2. View car information")
         print("3. View account")
@@ -102,41 +114,33 @@ def menu():
         print("6. Exit the program")
         
         answer = input()
-        
         match answer:
             case "1":
-                parking_garage = append_to_list()
-                print("Press any key to go back")
-                os.system('read -n 1 -s')
+                parking_garage = append_to_list(parking_garage)
+                input("Press Enter to go back")
             case "2":
-                try:
-                    license_num = license_input("Enter the license number of the car: \n")
-                    if len(list(parking_garage)) > 0 and license_num in parking_garage:
-                        print(parking_garage[license_num])
+                license_num = license_input("Enter the license number of the car: \n")
+                if len(list(parking_garage)) > 0 and license_num in parking_garage:
+                    #car = repr(list(parking_garage[license_num]))
+                    
+                    print(re.sub(r"[\([{})\]]", "", repr(parking_garage.get(license_num))))
+                else:
+                    if len(list(unparked_cars)) > 0 and license_num in unparked_cars:
+                        print(re.sub(r"[\([{})\]]", "", repr(parking_garage.get(license_num))))
                     else:
-                        if len(list(unparked_cars)) > 0 and license_num in unparked_cars:
-                            print(unparked_cars[license_num])
-                        else:
-                            raise Exception
-                except:
-                    print("There are currently no cars parked in the garage and your car has never been parked in the garage")  
+                        print("There are currently no cars parked in the garage and your car has never been parked in the garage")  
                 
-                print("Press any key to go back")
-                os.system('read -n 1 -s')
+                input("Press Enter to go back")
             case "3":
                 pass
             case "4":
                 read_from_file()
             case "5":
                 parking_garage,unparked_cars = unpark(parking_garage, unparked_cars)
-                print("Press any key to go back")
-                os.system('read -n 1 -s')
+                input("Press Enter to go back")
             case "6":
                 write_history_file(parking_garage)
                 exit()
-
-def main():
-    menu()
 
 if __name__ == '__main__':
     main()
