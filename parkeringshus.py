@@ -8,19 +8,20 @@ from dateutil.relativedelta import relativedelta
 from typed_input import *
 
 class Car():
-    def __init__(self, license_num, size, owner, parked = False, park = "", exit = "", debt = "0"):
+    def __init__(self, license_num, size, owner, parked = False, park = "", exit = "", debt = 0):
         self.license_num = license_num
         self.size = size
         self.owner = owner
         self.parked = parked
         self.park_time = park
         self.exit_time = exit
+        self.debt = debt
     
     def __repr__(self):
         str_license = "License number: " + self.license_num + "\n"
         str_size = "Size: " + str(self.size) + "\n"
         str_own = "Owner: " + self.owner + "\n"
-        
+        str_debt = "Debt: " + self.debt + "\n"
         if (self.parked == True):
             str_parked = "Parked: Yes\n"
         else:
@@ -30,30 +31,34 @@ class Car():
         
         if (self.exit_time != ""):
             str_exit_time = "Exit time: " + self.exit_time + "\n"
-            current_time = ""
             delta = relativedelta(parse(self.exit_time), parse(self.park_time))
             time_parked = (f"The car has been parked for {delta.years} year(s), {delta.months} months, {delta.days} days, {delta.hours} hours, {delta.minutes} minutes.")
-            
-        else:
-            str_exit_time = ""
-            current_timestamp = dt.datetime.now().isoformat()
-            current_time = (f"Current time: {current_timestamp}\n")
-            delta = relativedelta(parse(current_timestamp), parse(self.park_time))
-            time_parked = (f"The car has been parked for {delta.years} year(s), {delta.months} months, {delta.days} days, {delta.hours} hours, {delta.minutes} minutes.")
 
-        return (str_license + str_size + str_own + str_parked + str_park_time + str_exit_time + current_time + time_parked + "\n")
+        return (str_license + str_size + str_own + str_parked + str_park_time + str_exit_time + time_parked + str_debt + "\n")
 
-def write_history_file(garage):
-    parking_garage = list(garage.values())
+def write_history_file(parking_dict, entry_dict, exit_dict):
+    parked_cars = list(parking_dict.values())
+    entry_times = entry_dict
+    exit_times = exit_dict
+    history_file = "history.csv"
+    
     file = input_file("Which file do you want to save to (.csv)? ", "w")
-    for car in parking_garage:
+    for car in parked_cars:
         lines = re.sub(r"[\([{})\]]", "", repr(car).strip()).split("\n")
         lines.pop()
         file.write(",".join(lines) + "\n")
+    
+    for i in range(len(entry_times)):
+        lines = re.sub(r"[\([{})\]]", "", entry_times[i].strip())
+    
+    
 
-def read_from_file(parked_list, unparked_list):
+def read_from_file(parked_list, unparked_list, entry_dict, exit_dict):
     parked_cars = parked_list
     unparked_cars= unparked_list
+    entry_times = entry_dict
+    exit_times = entry_dict
+    
     
     file = input_file("Which file do you want to load from (.csv)? ", "r")
     lines = file.readlines()
@@ -69,10 +74,13 @@ def read_from_file(parked_list, unparked_list):
         elif (parked == "No"):
             parked_bool = False
         park_time = split_line[4][len("Park time: ")]
-        car = Car(license_num, size, owner, parked_bool, park_time)
+        debt = split_line[6][len("Debt: ")]
         if (parked_bool == True):
+            car = Car(license_num, size, owner, parked_bool, park_time, None, debt)
             parked_cars.update({license_num : car})
         elif (parked_bool == False):
+            exit_time = split_line[6][len("Exit time: ")]
+            car = Car(license_num, size, owner, parked_bool, park_time, exit_time, debt)
             unparked_cars.update({license_num : car})
     
     return parked_cars,unparked_cars
@@ -81,21 +89,22 @@ def park(unparked_list):
     unparked_cars = unparked_list
     
     status = input_type("Have you been parked before? (Yes/No) ", str)
-    if (status == "Yes"):
-        license_num = license_input("Enter the license number of the car: ")
-        park_timestamp = dt.datetime.now().isoformat()
-        if (license_num in unparked_cars):
-            car = unparked_cars.get(license_num)
-            car.parked= True
-            car.park = park_timestamp
-            car.exit = ""
-            return car
-    elif (status == "No"):
-        license_num = license_input("Enter the license number of the car: ")
-        size = size_input("Enter the size of the car (1/2/3): ")
-        owner = input_type("Enter the name of the owner of the car: ", str)
-        park_timestamp = dt.datetime.now().isoformat()
-        
+    while True: ## behöver fixa felhantering
+        if (status == "Yes"):
+            license_num = license_input("Enter the license number of the car: ")
+            park_timestamp = time_input("Which time did you park your car? (HH:MM)")
+            if (license_num in unparked_cars):
+                car = unparked_cars.get(license_num)
+                car.parked= True
+                car.park = park_timestamp
+                car.exit = ""
+                return car
+        elif (status == "No"):
+            license_num = license_input("Enter the license number of the car: ")
+            size = size_input("Enter the size of the car (1/2/3): ")
+            owner = input_type("Enter the name of the owner of the car: ", str)
+            park_timestamp = time_input("Which time did you park your car? (HH:MM)")
+            
         return Car(license_num, size, owner, True, park_timestamp)
 
 def unpark(parked_list, unparked_list):
@@ -113,12 +122,19 @@ def unpark(parked_list, unparked_list):
     
     return parked_cars,unparked_cars
 
-def append_to_list(parked_list, unparked_list):    
-    parked_cars = parked_list
-    unparked_cars= unparked_list
+def append_to_dict(parked_dict, unparked_dict, entry_dict, exit_dict):    
+    parked_cars = parked_dict
+    unparked_cars = unparked_dict
+    entry_times = entry_dict
+    exit_times = exit_dict
     
     car = park(unparked_cars)
     num = car.license_num
+    
+    if (num not in unparked_cars):
+        entry_times[num]
+    else:
+        entry_times[num].extend([car.park_time])
     
     parked_cars.update({num : car})
     print(re.sub(r"[\([{})\]]", "", repr(parked_cars.get(num))))
@@ -126,6 +142,23 @@ def append_to_list(parked_list, unparked_list):
     return parked_cars,unparked_cars
 
 def account(parked_list, unparked_list):
+    parked_cars = parked_list
+    unparked_cars= unparked_list
+    license_num = license_input("Enter the license number of the car: ")
+    choice = size_input("What would you like to do? (1/2/3)", str)
+    match choice:
+        case "1":
+            print("1. Check debts")
+            
+        case "2":
+            print("2. Pay debts")
+        case "3":
+            print("3. Go back")
+    
+def check_debts():
+    pass
+
+def calc_debts(parked_list, unparked_list):
     parked_cars = parked_list
     unparked_cars= unparked_list
     
@@ -139,6 +172,9 @@ def clear_terminal():
 def main():
     parking_garage = {}
     unparked_cars = {}
+    entry_dict = {}
+    exit_dict = {}
+    
     
     print("Welcome to the parking garage! Please choose one of the options below")
     while True:
@@ -154,7 +190,7 @@ def main():
         answer = input()
         match answer:
             case "1":
-                parking_garage,unparked_cars = append_to_list(parking_garage, unparked_cars)
+                parking_garage,unparked_cars,entry_dict,exit_dict = append_to_dict(parking_garage, unparked_cars, entry_dict, exit_dict)
                 input("Press Enter to go back")
             case "2":
                 license_num = license_input("Enter the license number of the car: \n")
@@ -170,11 +206,12 @@ def main():
             case "3":
                 pass
             case "4":
-                parking_garage,unparked_cars = read_from_file(parking_garage, unparked_cars)
+                parking_garage,unparked_cars,entry_dict,exit_dict = read_from_file(parking_garage, unparked_cars, entry_dict, exit_dict)
             case "5":
                 parking_garage,unparked_cars = unpark(parking_garage, unparked_cars)
                 input("Press Enter to go back")
             case "6":
+                parking_garage,unparked_cars = calc_debts(parking_garage, unparked_cars)
                 write_history_file(parking_garage)
                 exit()
 

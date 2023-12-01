@@ -72,3 +72,17 @@ def input_file(message : str):
             return open(user_input, "r", encoding="utf-8")
         except:
             print(f"There is no file named {user_input}. Please enter a new file: \n")
+            
+def time_input(message : str):
+    """Asks the user to input a time. If the program cannot match the time to HH:MM, the program will ask the user again.
+    Args:
+        message (string): Message displayed to user
+    Returns:
+        user_input: Time matching HH:MM format
+    """
+    while True:
+        user_input = input(message)
+        if (re.match(r'/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', user_input)):
+            return user_input
+        else:
+            print("You did not enter a time in the format HH:MM. Please enter a new time.")
