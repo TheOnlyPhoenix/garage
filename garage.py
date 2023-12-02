@@ -22,7 +22,7 @@ class Car():
         str_license = "License number: " + self.license_num + "\n"
         str_size = "Size: " + str(self.size) + "\n"
         str_own = "Owner: " + self.owner + "\n"
-        str_debt = "Debt: " + self.debt + "\n"
+        str_debt = "Debt: " + str(self.debt) + "\n"
         if (self.parked == True):
             str_parked = "Parked: Yes\n"
         else:
@@ -30,11 +30,13 @@ class Car():
         
         str_park_time = "Park time: " + self.park_time + "\n"
         
-        if (self.exit_time != ""):
+        if (self.exit_time != ""): # måste ändra så att om man parkerar igen ska exit_time rensas
             str_exit_time = "Exit time: " + self.exit_time + "\n"
             delta = relativedelta(parse(self.exit_time), parse(self.park_time))
             time_parked = (f"The car has been parked for {delta.years} year(s), {delta.months} months, {delta.days} days, {delta.hours} hours, {delta.minutes} minutes.")
-
+        else:
+            str_exit_time = ""
+            time_parked = ""
         return (str_license + str_size + str_own + str_parked + str_park_time + str_exit_time + time_parked + str_debt + "\n")
 
 def write_history_file(parking_dict, entry_dict, exit_dict):
@@ -45,12 +47,12 @@ def write_history_file(parking_dict, entry_dict, exit_dict):
     
     time_list = []
     
+    file2 = open(history_file, "w", encoding="utf-8")
     file = input_file("Which file do you want to save to (.csv)? ", "w")
     for car in parked_cars:
         lines = re.sub(r"[\([{})\]]", "", repr(car).strip()).split("\n")
         lines.pop()
         file.write(",".join(lines) + "\n")
-        file2 = open(history_file, "w", encoding="utf-8")
         for value in entry_times[car.license_num]:
             time_list.append[value]
         
@@ -94,7 +96,7 @@ def read_from_file(parked_list, unparked_list, entry_dict, exit_dict):
             car = Car(license_num, size, owner, parked_bool, park_time, exit_time, debt)
             unparked_cars.update({license_num : car})
     
-    return parked_cars,unparked_cars
+    return parked_cars,unparked_cars,entry_times,exit_times
         
 def park(unparked_list):
     unparked_cars = unparked_list
@@ -150,7 +152,7 @@ def append_to_dict(parked_dict, unparked_dict, entry_dict, exit_dict):
     parked_cars.update({num : car})
     print(re.sub(r"[\([{})\]]", "", repr(parked_cars.get(num))))
     
-    return parked_cars,unparked_cars
+    return parked_cars,unparked_cars,entry_times,exit_times
 
 def account(parked_list, unparked_list):
     parked_cars = parked_list
@@ -222,8 +224,8 @@ def main():
                 parking_garage,unparked_cars = unpark(parking_garage, unparked_cars)
                 input("Press Enter to go back")
             case "6":
-                parking_garage,unparked_cars = calc_debts(parking_garage, unparked_cars)
-                write_history_file(parking_garage)
+                #parking_garage,unparked_cars = calc_debts(parking_garage, unparked_cars)
+                write_history_file(parking_garage,entry_dict, exit_dict)
                 exit()
 
 if __name__ == '__main__':

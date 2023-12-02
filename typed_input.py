@@ -59,7 +59,7 @@ def size_input(message : str, convert_type = int):
         else:
             print(f"You did not enter 1, 2 or 3. Please try again")
 
-def input_file(message : str):
+def input_file(message : str, action = "r"):
     """Asks the user to input a filename. If the program cannot find the file specified by the user, the program will ask the user again.
     Args:
         message (string): Message displayed to user
@@ -69,7 +69,7 @@ def input_file(message : str):
     while True:
         user_input = input(message)
         try:
-            return open(user_input, "r", encoding="utf-8")
+            return open(user_input, action, encoding="utf-8")
         except:
             print(f"There is no file named {user_input}. Please enter a new file: \n")
             
@@ -82,7 +82,7 @@ def time_input(message : str):
     """
     while True:
         user_input = input(message)
-        if (re.match(r'/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', user_input)):
+        if (re.match(r'^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', user_input)):
             return user_input
         else:
             print("You did not enter a time in the format HH:MM. Please enter a new time.")
