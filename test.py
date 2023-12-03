@@ -1,25 +1,68 @@
-from collections import defaultdict
-import re
+# import re
+# from collections import defaultdict
 
-key = "key1"
+# list1 = []
+# my_dict1 = defaultdict(list)
 
-my_dict1 = defaultdict(list)
-my_dict1[key].append("00:11")
-my_dict1[key].append("12:52")
+# key = "key1"
+# value1 = "00:11"
+# value2 = "12:52"
 
-list1 = []
+# print(value1)
+# print(type(value1))
+# print(my_dict1)
+# my_dict1[key].append(value1)
+# print(my_dict1[key])
 
-history_file = "history.csv"
 
-for value in (my_dict1[key]):
-    list1.append(value)
-with open(history_file, "w", encoding="utf-8") as file:
-    e = True
-    for i in range(len(list1)):
-        lines = re.sub(r"[\([{})\]]", "", list1[i])
-        while e == True:
-            file.write(key + ",")
-            e = False
-        print(lines)
-        file.write(lines + ",")
-print(list1)
+# #my_dict1[key].append(value2)
+# history_file = "history.csv"
+
+# for value in (my_dict1[key]):
+#     list1.append(value)
+#     print(type(value))
+# with open(history_file, "w", encoding="utf-8") as file:
+#     e = True
+#     for i in range(len(list1)):
+#         lines = re.sub(r"[\([{})\]]", "", list1[i])
+#         while e == True:
+#             file.write(key + ",")
+#             e = False
+#         print(lines)
+#         file.write(lines + ",")
+# print(list1)
+
+# from itertools import chain
+
+# dictionary1 = {'a': 1, 'b': 2, 'c': 3}
+# dictionary2 = {'c': 4, 'd': 5, 'e': 6}
+
+# # Key you want to check
+# key_to_check = 'c'
+
+# # Iterate over the dictionaries and check if the key exists
+# for dictionary, keys in zip([dictionary1, dictionary2], ['e', 'f']):
+#     if key_to_check in dictionary:
+#         print(f'The key "{key_to_check}" exists in {keys}.')
+#         break
+# else:
+#     print(f'The key "{key_to_check}" does not exist in either dictionary.')
+
+
+from itertools import chain
+
+dictionary1 = {'a': 1, 'b': 2, 'c': 3}
+dictionary2 = {'c': 4, 'd': 5, 'e': 6}
+
+# Combine the dictionaries
+combined_dicts = chain([dictionary1], [dictionary2])
+
+# Iterate over the keys in the combined dictionaries
+for key_to_check in set(chain(dictionary1.keys(), dictionary2.keys())):
+    if key_to_check in dictionary1:
+        print(f'The key "{key_to_check}" exists in {dictionary1}.')
+        # Do your thing here
+    else:
+        print(f'The key "{key_to_check}" exists in {dictionary2}.')
+
+
