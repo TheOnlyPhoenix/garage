@@ -38,6 +38,31 @@ class Car():
             time_parked = ""
         return (str_license + str_size + str_own + str_parked + str_park_time + str_exit_time + time_parked + str_debt + "\n")
 
+    def account(self, entry_list, exit_list):
+        entry_dict = entry_list
+        exit_dict = exit_list
+        choice = size_input("What would you like to do? (1/2/3)", int)
+        match choice:
+            case 1:
+                print("1. Check debts")
+                self.check_debt(entry_dict, exit_dict)
+            case 2:
+                print("2. Pay debts")
+                self.pay_debt()
+            case 3:
+                print("3. Go back")
+    
+    def check_debt(self):
+        self.calc_debt()
+        
+    def pay_debt(self):
+        self.calc_debt()
+
+    def calc_debt(self):
+        debt = self.debt
+        self.exit_time
+    
+    
 def write_history_file(parking_dict, unparked_dict, entry_dict, exit_dict):
     parked_cars = parking_dict
     unparked_cars = unparked_dict
@@ -160,27 +185,6 @@ def append_to_dict(parked_dict, unparked_dict, entry_dict, exit_dict):
     print(re.sub(r"[\([{})\]]", "", repr(parked_cars.get(num))))
     
     return parked_cars,unparked_cars,entry_times,exit_times
-
-def account(parked_list, unparked_list):
-    parked_cars = parked_list
-    unparked_cars= unparked_list
-    license_num = license_input("Enter the license number of the car: ")
-    choice = size_input("What would you like to do? (1/2/3)", str)
-    match choice:
-        case "1":
-            print("1. Check debts")
-            
-        case "2":
-            print("2. Pay debts")
-        case "3":
-            print("3. Go back")
-    
-def check_debts():
-    pass
-
-def calc_debts(parked_list, unparked_list):
-    parked_cars = parked_list
-    unparked_cars= unparked_list
     
 
 def clear_terminal():
@@ -224,7 +228,19 @@ def main():
                 
                 input("Press Enter to go back")
             case "3":
-                pass
+                license_num = license_input("Enter the license number of the car: \n")
+                while True:
+                    if (len(list(parking_garage)) > 0 and license_num in parking_garage):
+                        car = parking_garage.get(license_num)
+                        car.account(entry_dict, exit_dict)
+                        break
+                    else:
+                        if (len(list(unparked_cars)) > 0 and license_num in unparked_cars):
+                            car = unparked_cars.get(license_num)
+                            car.account(entry_dict, exit_dict)
+                            break
+                        else:
+                            print("Your car isn't currently parked and has never been parked in the garage. Please try again.")
             case "4":
                 parking_garage, unparked_cars, entry_dict, exit_dict = read_from_file(parking_garage, unparked_cars, entry_dict, exit_dict)
             case "5":
