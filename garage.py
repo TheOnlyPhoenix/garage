@@ -8,7 +8,7 @@ from collections import defaultdict
 from itertools import chain
 
 class Car():
-    def __init__(self, license_num, size, owner, parked = False, park = "", exit = "", debt = 0):
+    def __init__(self, license_num, size, owner, parked = False, park = "", exit = "", debt = 0, park_day = "", exit_day = ""):
         self.license_num = license_num
         self.size = size
         self.owner = owner
@@ -16,6 +16,8 @@ class Car():
         self.park_time = park
         self.exit_time = exit
         self.debt = debt
+        self.park_day = park_day
+        self.exit_day = exit_day
     
     def __repr__(self):
         str_license = "License number: " + self.license_num + "\n"
@@ -38,37 +40,52 @@ class Car():
             time_parked = ""
         return (str_license + str_size + str_own + str_parked + str_park_time + str_exit_time + time_parked + str_debt + "\n")
 
-    def account(self, entry_list, exit_list):
-        entry_dict = entry_list
-        exit_dict = exit_list
+    def account(self, entry_dict, exit_dict, day):
+        entry_list = list(entry_dict[self.license_num])
+        exit_list = list(exit_dict[self.license_num]) 
+        self.calc_debt(entry_list, exit_list, day)
         choice = size_input("What would you like to do? (1/2/3)", int)
         match choice:
             case 1:
                 print("1. Check debts")
-                self.check_debt(entry_dict, exit_dict)
+                self.check_debt(entry_dict, exit_dict, day)
             case 2:
                 print("2. Pay debts")
-                self.pay_debt()
+                self.pay_debt(entry_list, exit_list, day)
             case 3:
                 print("3. Go back")
     
-    def check_debt(self):
-        self.calc_debt()
+    def check_debt(self, entry_dict, exit_dict):
+        pass
         
-    def pay_debt(self):
-        self.calc_debt()
+        
+    def pay_debt(self, entry_list, exit_list, day):
+        self.calc_debt(entry_list, exit_list, day)
 
-    def calc_debt(self):
-        debt = self.debt
-        self.exit_time
+    def calc_debt(self, entry_list, exit_list, day):
+        input(entry_list)
+        input(exit_list)
+        for entry_time, exit_time in zip(entry_list, exit_list):
+            print(entry_time, exit_time)
+            time1 = int(entry_time.split(":"))
+            time2 = int(exit_time.split(":"))
+            print(time1)
+            input
+            if time1[1] > time2[1]:
+                diff_hours = time1[1] - time2[1]
+                diff_hours = 24 - diff_hours
+            else:
+                diff_hours = time1[1] - time2[1]
+            
+            time_parked = diff_hours + day * 24
+            
+                
+        
     
     
-def write_history_file(parking_dict, unparked_dict, entry_dict, exit_dict):
-    parked_cars = parking_dict
-    unparked_cars = unparked_dict
-    entry_times = entry_dict
-    exit_times = exit_dict
+def write_history_file(parking_dict, unparked_dict, entry_dict, exit_dict, day):
     history_file = "history.csv"
+    cur_day = day
     
     time_list = []
     
@@ -76,16 +93,16 @@ def write_history_file(parking_dict, unparked_dict, entry_dict, exit_dict):
     file = input_file("Which file do you want to save to (.csv)? ", "w")
     
 
-    for num_to_check in set(chain(parked_cars.keys(), unparked_cars.keys())):
-        if num_to_check in parked_cars:
-            car = parked_cars[num_to_check]
-        elif num_to_check in unparked_cars:
-            car = unparked_cars[num_to_check]
+    for num_to_check in set(chain(parking_dict.keys(), unparked_dict.keys())):
+        if num_to_check in parking_dict:
+            car = parking_dict[num_to_check]
+        elif num_to_check in unparked_dict:
+            car = unparked_dict[num_to_check]
         e = True
         lines = re.sub(r"[\([{})\]]", "", repr(car).strip()).split("\n")
         lines.pop()
         file.write(",".join(lines) + "\n")
-        for value in entry_times[car.license_num]:
+        for value in entry_dict[car.license_num]:
           time_list.append(value)
         for i in range(len(time_list)):
             lines = re.sub(r"[\([{})\]]", "", time_list[i])
@@ -93,17 +110,11 @@ def write_history_file(parking_dict, unparked_dict, entry_dict, exit_dict):
                 file2.write(car.license_num + ",")
                 e = False
             print(lines)
-            file2.write(lines + ",")
+            file2.write(day + ":" + lines + ",")
         file2.write("\n")
             
 
-def read_from_file(parked_list, unparked_list, entry_dict, exit_dict):
-    parked_cars = parked_list
-    unparked_cars= unparked_list
-    entry_times = entry_dict
-    exit_times = entry_dict
-    
-    
+def read_from_file(parked_dict, unparked_dict, entry_dict, exit_dict):   
     file = input_file("Which file do you want to load from (.csv)? ", "r")
     lines = file.readlines()
     
@@ -121,13 +132,13 @@ def read_from_file(parked_list, unparked_list, entry_dict, exit_dict):
         debt = split_line[6][len("Debt: ")]
         if (parked_bool == True):
             car = Car(license_num, size, owner, parked_bool, park_time, None, debt)
-            parked_cars.update({license_num : car})
+            parked_dict.update({license_num : car})
         elif (parked_bool == False):
             exit_time = split_line[6][len("Exit time: ")]
             car = Car(license_num, size, owner, parked_bool, park_time, exit_time, debt)
-            unparked_cars.update({license_num : car})
+            unparked_dict.update({license_num : car})
     
-    return parked_cars,unparked_cars,entry_times,exit_times
+    return parked_dict,unparked_dict,entry_dict,exit_dict
         
 def park(unparked_list):
     unparked_cars = unparked_list
@@ -199,7 +210,7 @@ def main():
     entry_dict = defaultdict(list)
     exit_dict = defaultdict(list)
     
-    
+    day = input("What day of the month is it? ")
     print("Welcome to the parking garage! Please choose one of the options below")
     while True:
         clear_terminal()
@@ -229,15 +240,17 @@ def main():
                 input("Press Enter to go back")
             case "3":
                 license_num = license_input("Enter the license number of the car: \n")
+                car = parking_garage.get(license_num)
+                car.calc_debt(list(entry_dict[license_num], list(exit_dict[license_num]), day))
                 while True:
                     if (len(list(parking_garage)) > 0 and license_num in parking_garage):
                         car = parking_garage.get(license_num)
-                        car.account(entry_dict, exit_dict)
+                        car.account(entry_dict, exit_dict, day)
                         break
                     else:
                         if (len(list(unparked_cars)) > 0 and license_num in unparked_cars):
                             car = unparked_cars.get(license_num)
-                            car.account(entry_dict, exit_dict)
+                            car.account(entry_dict, exit_dict, day)
                             break
                         else:
                             print("Your car isn't currently parked and has never been parked in the garage. Please try again.")
@@ -248,7 +261,7 @@ def main():
                 input("Press Enter to go back")
             case "6":
                 #parking_garage,unparked_cars = calc_debts(parking_garage, unparked_cars)
-                write_history_file(parking_garage, unparked_cars, entry_dict, exit_dict)
+                write_history_file(parking_garage, unparked_cars, entry_dict, exit_dict, day)
                 exit()
 
 if __name__ == '__main__':

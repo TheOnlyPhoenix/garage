@@ -49,20 +49,27 @@
 #     print(f'The key "{key_to_check}" does not exist in either dictionary.')
 
 
-from itertools import chain
+# from itertools import chain
 
-dictionary1 = {'a': 1, 'b': 2, 'c': 3}
-dictionary2 = {'c': 4, 'd': 5, 'e': 6}
+# dictionary1 = {'a': 1, 'b': 2, 'c': 3}
+# dictionary2 = {'c': 4, 'd': 5, 'e': 6}
+# key1 = "a"
 
-# Combine the dictionaries
-combined_dicts = chain([dictionary1], [dictionary2])
+# # Combine the dictionaries
+# combined_dicts = chain([dictionary1], [dictionary2])
 
-# Iterate over the keys in the combined dictionaries
-for key_to_check in set(chain(dictionary1.keys(), dictionary2.keys())):
-    if key_to_check in dictionary1:
-        print(f'The key "{key_to_check}" exists in {dictionary1}.')
-        # Do your thing here
-    else:
-        print(f'The key "{key_to_check}" exists in {dictionary2}.')
+# # Iterate over the keys in the combined dictionaries
+# for key_to_check in set(chain(dictionary1.keys(), dictionary2.keys())):
+#     if key_to_check in dictionary1:
+#         print(f'The key "{key_to_check}" exists in {dictionary1}.')
+#         # Do your thing here
+#     else:
+#         print(f'The key "{key_to_check}" exists in {dictionary2}.')
+# print(dictionary1[key1])
 
 
+time1_list = [1, 2, 3]
+time2_list = ['a', 'b', 'c']
+
+for time1, time2 in zip(time1_list, time2_list):
+    print(time1, time2)
