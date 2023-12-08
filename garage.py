@@ -44,16 +44,18 @@ class Car():
         entry_list = list(entry_dict[self.license_num])
         exit_list = list(exit_dict[self.license_num]) 
         self.calc_debt(entry_list, exit_list, day)
+        print("1. Check debts")
+        print("2. Pay debts")
+        print("3. Go back")
         choice = size_input("What would you like to do? (1/2/3)", int)
         match choice:
             case 1:
-                print("1. Check debts")
                 self.check_debt(entry_dict, exit_dict, day)
             case 2:
-                print("2. Pay debts")
                 self.pay_debt(entry_list, exit_list, day)
             case 3:
-                print("3. Go back")
+                pass
+                
     
     def check_debt(self, entry_dict, exit_dict):
         pass
@@ -63,21 +65,33 @@ class Car():
         self.calc_debt(entry_list, exit_list, day)
 
     def calc_debt(self, entry_list, exit_list, day):
-        input(entry_list)
-        input(exit_list)
-        for entry_time, exit_time in zip(entry_list, exit_list):
-            print(entry_time, exit_time)
-            time1 = int(entry_time.split(":"))
-            time2 = int(exit_time.split(":"))
-            print(time1)
-            input
-            if time1[1] > time2[1]:
-                diff_hours = time1[1] - time2[1]
-                diff_hours = 24 - diff_hours
-            else:
-                diff_hours = time1[1] - time2[1]
+        print("hi1")
+        if len(exit_list) == len(entry_list):
+            for entry_time, exit_time in zip(entry_list, exit_list):
+                print("hi2")
+                time1 = int(entry_time.split(":"))
+                time2 = int(exit_time.split(":"))
+                print(time1)
+                input
+                if time1[1] > time2[1]:
+                    diff_hours = time1[1] - time2[1]
+                    diff_hours = 24 - diff_hours
+                else:
+                    diff_hours = time1[1] - time2[1]
             
-            time_parked = diff_hours + day * 24
+                time_parked = diff_hours +  time1[0] * 24   
+        else:
+            for entry_time in entry_list:
+                time1 = int(entry_time.split[":"])
+                time2 = time_input("What time is it now? (HH:MM)")
+                if time1[1] > time2:
+                    diff_hours = time1[1] - time2
+                    diff_hours = 24 - diff_hours
+                else:
+                    diff_hours = time1 - time2
+                time_parked = diff_hours +  time1[0] * 24
+            
+                
             
                 
         
@@ -110,7 +124,7 @@ def write_history_file(parking_dict, unparked_dict, entry_dict, exit_dict, day):
                 file2.write(car.license_num + ",")
                 e = False
             print(lines)
-            file2.write(day + ":" + lines + ",")
+            file2.write(lines + ",")
         file2.write("\n")
             
 
@@ -140,16 +154,14 @@ def read_from_file(parked_dict, unparked_dict, entry_dict, exit_dict):
     
     return parked_dict,unparked_dict,entry_dict,exit_dict
         
-def park(unparked_list):
-    unparked_cars = unparked_list
-    
+def park(unparked_dict):    
     status = input_type("Have you been parked before? (Yes/No) ", str)
     while True: ## behöver fixa felhantering ## ska funka nu
         if (status == "Yes"):
-            license_num = license_input("Enter the license number of the car: ")
+            license_num = license_input("Enter the license number of the car (ABC123): ")
             park_timestamp = time_input("Which time did you park your car? (HH:MM)")
-            if (license_num in unparked_cars):
-                car = unparked_cars.get(license_num)
+            if (license_num in unparked_dict):
+                car = unparked_dict.get(license_num)
                 car.parked= True
                 car.park = park_timestamp
                 car.exit = ""
@@ -158,7 +170,7 @@ def park(unparked_list):
                 print("The license number you entered has never been parked here. Please try again. ")
                 continue
         elif (status == "No"):
-            license_num = license_input("Enter the license number of the car: ")
+            license_num = license_input("Enter the license number of the car (ABC123): ")
             size = size_input("Enter the size of the car (1/2/3): ")
             owner = input_type("Enter the name of the owner of the car: ", str)
             park_timestamp = time_input("Which time did you park your car? (HH:MM) ")
@@ -166,36 +178,28 @@ def park(unparked_list):
         else:
             status = input("You did not enter \"Yes\" or \"No\". Please try again: ")
 
-def unpark(parked_list, unparked_list):
-    parked_cars = parked_list
-    unparked_cars= unparked_list
-    
-    num = exit_input("Enter the license number of your car: ", parked_cars)
-    car = parked_cars[num]
+def unpark(parked_dict, unparked_dict, exit_dict, day):
+    num = exit_input("Enter the license number of your car (ABC123): ", parked_dict)
+    car = parked_dict[num]
     car.parked = False
     car.exit_time = time_input("Which time did you exit the garage? (HH:MM)")
-    
-    unparked_list.update({num : car})
-    del parked_cars[num]
+    day_and_time = day + ":" + car.exit_time
+    exit_dict[num].append(day_and_time)
+    unparked_dict.update({num : car})
+    del parked_dict[num]
     print("Thank you for parking!")
     
-    return parked_cars,unparked_cars
+    return parked_dict,unparked_dict,exit_dict
 
-def append_to_dict(parked_dict, unparked_dict, entry_dict, exit_dict):    
-    parked_cars = parked_dict
-    unparked_cars = unparked_dict
-    entry_times = entry_dict
-    exit_times = exit_dict
-    
-    car = park(unparked_cars)
+def append_to_dict(parked_dict, unparked_dict, entry_dict, day):    
+    car = park(unparked_dict)
     num = car.license_num
-
-    entry_times[num].append(car.park_time)
-
-    parked_cars.update({num : car})
-    print(re.sub(r"[\([{})\]]", "", repr(parked_cars.get(num))))
+    day_and_time = day + ":" + car.park_time
+    entry_dict[num].append(day_and_time)
+    parked_dict.update({num : car})
+    print(re.sub(r"[\([{})\]]", "", repr(parked_dict.get(num))))
     
-    return parked_cars,unparked_cars,entry_times,exit_times
+    return parked_dict,unparked_dict,entry_dict
     
 
 def clear_terminal():
@@ -209,8 +213,9 @@ def main():
     unparked_cars = {}
     entry_dict = defaultdict(list)
     exit_dict = defaultdict(list)
+    day_list = []
     
-    day = input("What day of the month is it? ")
+    day = str(input_type("What day of the month is it? ", int))
     print("Welcome to the parking garage! Please choose one of the options below")
     while True:
         clear_terminal()
@@ -225,10 +230,10 @@ def main():
         answer = input()
         match answer:
             case "1":
-                parking_garage, unparked_cars, entry_dict, exit_dict = append_to_dict(parking_garage, unparked_cars, entry_dict, exit_dict)
+                parking_garage, unparked_cars, entry_dict = append_to_dict(parking_garage, unparked_cars, entry_dict, day)
                 input("Press Enter to go back")
             case "2":
-                license_num = license_input("Enter the license number of the car: \n")
+                license_num = license_input("Enter the license number of the car (ABC123): \n")
                 if (len(list(parking_garage)) > 0 and license_num in parking_garage):
                     print(re.sub(r"[\([{})\]]", "", repr(parking_garage.get(license_num))))
                 else:
@@ -239,9 +244,9 @@ def main():
                 
                 input("Press Enter to go back")
             case "3":
-                license_num = license_input("Enter the license number of the car: \n")
+                license_num = license_input("Enter the license number of the car (ABC123): \n")
                 car = parking_garage.get(license_num)
-                car.calc_debt(list(entry_dict[license_num], list(exit_dict[license_num]), day))
+                #car.calc_debt(list(entry_dict[license_num]), list(exit_dict[license_num]), day)
                 while True:
                     if (len(list(parking_garage)) > 0 and license_num in parking_garage):
                         car = parking_garage.get(license_num)
@@ -257,7 +262,7 @@ def main():
             case "4":
                 parking_garage, unparked_cars, entry_dict, exit_dict = read_from_file(parking_garage, unparked_cars, entry_dict, exit_dict)
             case "5":
-                parking_garage, unparked_cars = unpark(parking_garage, unparked_cars)
+                parking_garage, unparked_cars = unpark(parking_garage, unparked_cars, exit_dict, day)
                 input("Press Enter to go back")
             case "6":
                 #parking_garage,unparked_cars = calc_debts(parking_garage, unparked_cars)
