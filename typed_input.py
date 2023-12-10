@@ -3,11 +3,6 @@ import re
 
 def input_type(message : str, convert_type = str):
     """Asks the user for input. If the program is unable to convert to the type 'convert_type', the program will ask the user again.
-    Args:
-        message (string): Message displayed to user
-        convert_type (class): Type to convert input to
-    Returns:
-        convert_type: Input of type (convert_type)
     """
     while True:
         user_input = input(message)
@@ -18,10 +13,6 @@ def input_type(message : str, convert_type = str):
 
 def license_input(message : str):
     """Asks the user for input. If the program is unable to match a regular expression to '^[A-Z]{3}\d{3}$', the program will ask the user again.
-    Args:
-        message (string): Message displayed to user
-    Returns:
-        user_input: Input matched to regular expression ('^[A-Z]{3}\d{3}$')
     """
     while True:
         user_input = input_type(message, str)
@@ -32,11 +23,6 @@ def license_input(message : str):
 
 def exit_input(message : str, parking_list : dict):
     """Asks the user for input. If the program is unable to match a regular expression to '^[A-Z]{3}\d{3}$' and find the input in a list, the program will ask the user again.
-    Args:
-        message (string): Message displayed to user
-        parking_list (list): List to check license number against
-    Returns:
-        user_input: Input matched to regular expression ('^[A-Z]{3}\d{3}$') and checked to exist in list
     """
     while True:
         user_input = input_type(message, str)   
@@ -47,10 +33,6 @@ def exit_input(message : str, parking_list : dict):
 
 def size_input(message : str, convert_type = int):
     """Asks the user for input. If the program is unable to find 1, 2 or 3 as the input, the program will ask the user again.
-    Args:
-        message (string): Message displayed to user
-    Returns:
-        user_input: Input that is 1, 2 or 3
     """
     while True:
         user_input = input_type(message, convert_type)
@@ -61,10 +43,6 @@ def size_input(message : str, convert_type = int):
 
 def input_file(message : str, action = "r"):
     """Asks the user to input a filename. If the program cannot find the file specified by the user, the program will ask the user again.
-    Args:
-        message (string): Message displayed to user
-    Returns:
-        TextIOWrapper: Object representing the file with data.
     """
     while True:
         user_input = input(message)
@@ -75,10 +53,6 @@ def input_file(message : str, action = "r"):
             
 def time_input(message : str):
     """Asks the user to input a time. If the program cannot match the time to HH:MM, the program will ask the user again.
-    Args:
-        message (string): Message displayed to user
-    Returns:
-        user_input: Time matching HH:MM format
     """
     while True:
         user_input = input(message)

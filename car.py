@@ -1,6 +1,7 @@
 from typed_input import *
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
+from main import clear_terminal
 class Car():
     def __init__(self, license_num, size, owner, park_time, exit_time, debt = 0):
         self.license_num = license_num
@@ -24,49 +25,76 @@ class Car():
     def account(self, entry_dict, exit_dict):
         entry_list = list(entry_dict[self.license_num])
         exit_list = list(exit_dict[self.license_num]) 
-        self.calc_debt(entry_list, exit_list)
+        park_hours, park_minutes = self.calc_debt(entry_list, exit_list)
         print("1. Check debts")
         print("2. Pay debts")
         print("3. Go back")
         choice = size_input("What would you like to do? (1/2/3)", int)
         match choice:
             case 1:
-                self.check_debt(entry_dict, exit_dict)
+                self.check_debt(park_hours, park_minutes)
             case 2:
-                self.pay_debt(entry_list, exit_list)
+                self.pay_debt()
             case 3:
                 pass
                 
     
-    def check_debt(self, entry_dict, exit_dict):
-        pass
+    def check_debt(self, park_hours, park_minutes):
+        print(f"You have parked for a total of {park_hours} hours and {park_minutes} minutes.")
+        print(f"Your total debt is {self.debt}")
+        input("Press Enter to go back")
+        clear_terminal()
         
-        
-    def pay_debt(self, entry_list, exit_list):
-        self.calc_debt(entry_list, exit_list)
+    def pay_debt(self):
+        choice = input(f"Your total debt is {self.debt}. Do you wish to pay it now? (Yes/No)")
+        match choice:
+            case "Yes":
+                amount = input_type("How much do you wish to pay?", int)
+                self.debt = self.debt - amount
+                print(f"Thank you for paying! Your remaining debt is {self.debt}")
+            case "No":
+                print("Okay. Beware of dangers on the roads :)")
+            case _:
+                print("You did not enter a valid answer. Please try again.")
+                self.pay_debt()
+        clear_terminal()
 
     def calc_debt(self, entry_list, exit_list):
-        # Needs changing to be absolute (modulo) not hardcoded 1/0
         if len(exit_list) == len(entry_list):
             for entry_time, exit_time in zip(entry_list, exit_list):
                 time = entry_time.split(";")[1]
                 time1 = time.split(":")
-                input(time1)
                 time2 = exit_time.split(":")
-                if time1[1] > time2[1]:
-                    diff_hours = int(time1[1]) - (time2[1])
-                    diff_hours = 24 - diff_hours
-                else:
-                    diff_hours = time1[1] - time2[1]
-            
-                time_parked = diff_hours +  time1[0] * 24   
+
+                time1_hours = time1[0]
+                time1_minutes = time1[1]
+                time2_hours = time2[0]
+                time2_minutes = time2[1]
+
+                time1_total_minutes = int(time1_hours) * 60 + int(time1_minutes)
+                time2_total_minutes = int(time2_hours) * 60 + int(time2_minutes)
+                total_minutes = time2_total_minutes - time1_total_minutes
+                park_time_hours = total_minutes // 60
+                park_time_minutes = total_minutes % 60
+                debt_calc_time = total_minutes // 30
+                self.debt = self.debt + (15 + self.size * 5) * debt_calc_time 
+                return park_time_hours, park_time_minutes
         else:
             for entry_time in entry_list:
-                time1 = entry_time.split[":"]
-                time2 = time_input("What time is it now? (HH:MM)")
-                if time1[1] > time2:
-                    diff_hours = time1[1] - time2
-                    diff_hours = 24 - diff_hours
-                else:
-                    diff_hours = time1 - time2
-                time_parked = diff_hours +  time1[0] * 24
+                time1 = entry_time.split(":")
+                time2 = time_input("What time is it now? (HH:MM)").split(":")
+                
+                time1_hours = time1[0]
+                time1_minutes = time1[1]
+                time2_hours = time2[0]
+                time2_minutes = time2[1]
+
+                time1_total_minutes = int(time1_hours) * 60 + int(time1_minutes)
+                time2_total_minutes = int(time2_hours) * 60 + int(time2_minutes)
+                total_minutes = time2_total_minutes - time1_total_minutes
+                park_time_hours = total_minutes // 60
+                park_time_minutes = total_minutes % 60
+                debt_calc_time = total_minutes // 30
+                self.debt = self.debt + (15 + self.size * 5) * debt_calc_time 
+                return park_time_hours, park_time_minutes
+        

@@ -1,3 +1,6 @@
+"""Main file in the program.
+"""
+
 import sys
 import os
 import platform
@@ -7,7 +10,8 @@ from typed_input import *
 from collections import defaultdict
 from itertools import chain
             
-def write_history_file(garage, day):
+def write_history_file(garage):
+    """Function that extracts car info and times from various dictionaries in the program, and writes them to two separate files. One file is decided by the user, the other is decided by the program."""
     history_file = "history.csv"
     entry_list = []
     exit_list = []
@@ -38,6 +42,7 @@ def write_history_file(garage, day):
         file2.write("\n")
             
 def read_from_file(garage):   
+    """Function"""
     license_num = ""
     file = input_file("Which file do you want to load from (.csv)? ", "r")
     try:
@@ -125,13 +130,14 @@ def menu(garage):
                 license_num = license_input("Enter the license number of the car (ABC123): \n")
                 car = garage.parked_dict.get(license_num)
                 while True:
+                    input(list(garage.parked_dict))
                     if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
                         car = garage.parked_dict.get(license_num)
                         car.account(garage.entry_dict, garage.exit_dict)
                         break
                     else:
-                        if (len(list(garage.unparked_dict)) > 0 and license_num in garage.unparked_dict):
-                            car = garage.unparked_dict.get(license_num)
+                        if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
+                            car = garage.parked_dict.get(license_num)
                             car.account(garage.entry_dict, garage.exit_dict)
                             break
                         else:
