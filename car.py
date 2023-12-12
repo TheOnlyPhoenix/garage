@@ -1,14 +1,15 @@
+import os
+import platform
 from typed_input import *
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from main import clear_terminal
+
 class Car():
-    def __init__(self, license_num, size, owner, park_time, exit_time, debt = 0):
+    def __init__(self, license_num, size, owner, park_time = "", debt = 0):
         self.license_num = license_num
         self.size = size
         self.owner = owner
         self.park_time = park_time
-        self.exit_time = exit_time
         self.debt = debt
     
     def __repr__(self):
@@ -16,16 +17,14 @@ class Car():
         str_size = "Size: " + str(self.size) + "\n"
         str_own = "Owner: " + self.owner + "\n"
         str_debt = "Debt: " + str(self.debt) 
-        str_park_time = "Park time: " + self.park_time + "\n"        
-        str_exit_time = "Exit time: " + self.exit_time + "\n"
-        delta = relativedelta(parse(self.exit_time), parse(self.park_time))
-        time_parked = (f"The car has been parked for {delta.years} year(s), {delta.months} months, {delta.days} days, {delta.hours} hours, {delta.minutes} minutes. \n")
-        return (str_license + str_size + str_own + str_park_time + str_exit_time + time_parked + str_debt)
+        #delta = relativedelta(parse(self.exit_time), parse(self.park_time))
+        #time_parked = (f"The car has been parked for {delta.years} year(s), {delta.months} months, {delta.days} days, {delta.hours} hours, {delta.minutes} minutes. \n")
+        return (str_license + str_size + str_own + str_debt)
 
     def account(self, entry_dict, exit_dict):
         entry_list = list(entry_dict[self.license_num])
         exit_list = list(exit_dict[self.license_num]) 
-        park_hours, park_minutes = self.calc_debt(entry_list, exit_list)
+        park_hours, park_minutes = self.calc_debt(entry_list, exit_list, False)
         print("1. Check debts")
         print("2. Pay debts")
         print("3. Go back")
@@ -37,8 +36,7 @@ class Car():
                 self.pay_debt()
             case 3:
                 pass
-                
-    
+
     def check_debt(self, park_hours, park_minutes):
         print(f"You have parked for a total of {park_hours} hours and {park_minutes} minutes.")
         print(f"Your total debt is {self.debt}")
@@ -51,6 +49,7 @@ class Car():
             case "Yes":
                 amount = input_type("How much do you wish to pay?", int)
                 self.debt = self.debt - amount
+                self.park_time = ""
                 print(f"Thank you for paying! Your remaining debt is {self.debt}")
             case "No":
                 print("Okay. Beware of dangers on the roads :)")
@@ -59,9 +58,9 @@ class Car():
                 self.pay_debt()
         clear_terminal()
 
-    def calc_debt(self, entry_list, exit_list):
-        if len(exit_list) == len(entry_list):
-            for entry_time, exit_time in zip(entry_list, exit_list):
+    def calc_debt(self, entry, exit, single_list_bool):
+        if single_list_bool == False:
+            for entry_time, exit_time in zip(entry, exit):
                 time = entry_time.split(";")[1]
                 time1 = time.split(":")
                 time2 = exit_time.split(":")
@@ -78,12 +77,19 @@ class Car():
                 park_time_minutes = total_minutes % 60
                 debt_calc_time = total_minutes // 30
                 self.debt = self.debt + (15 + self.size * 5) * debt_calc_time 
+                if len(str(park_time_hours)) == 1:
+                    park_time_hours = "0" + str(park_time_hours)
+                else:
+                    park_time_hours = str(park_time_hours)
+                if len(str(park_time_minutes)) == 1:
+                    park_time_minutes = "0" + str(park_time_minutes)
+                else:
+                    park_time_minutes = str(park_time_minutes)
                 return park_time_hours, park_time_minutes
-        else:
-            for entry_time in entry_list:
-                time1 = entry_time.split(":")
-                time2 = time_input("What time is it now? (HH:MM)").split(":")
-                
+        elif single_list_bool == True:
+                time1 = entry.split(":")
+                time2 = exit.split(":")
+
                 time1_hours = time1[0]
                 time1_minutes = time1[1]
                 time2_hours = time2[0]
@@ -92,9 +98,25 @@ class Car():
                 time1_total_minutes = int(time1_hours) * 60 + int(time1_minutes)
                 time2_total_minutes = int(time2_hours) * 60 + int(time2_minutes)
                 total_minutes = time2_total_minutes - time1_total_minutes
-                park_time_hours = total_minutes // 60
-                park_time_minutes = total_minutes % 60
+                if self.park_time != "":
+                    park_time_hours = total_minutes // 60 + int(self.park_time.split(":")[0])
+                    park_time_minutes = total_minutes % 60 + int(self.park_time.split(":")[1])
+                else:
+                    park_time_hours = total_minutes // 60 
+                    park_time_minutes = total_minutes % 60
                 debt_calc_time = total_minutes // 30
                 self.debt = self.debt + (15 + self.size * 5) * debt_calc_time 
+                if len(str(park_time_hours)) == 1:
+                    park_time_hours = "0" + str(park_time_hours)
+                else:
+                    park_time_hours = str(park_time_hours)
+                if len(str(park_time_minutes)) == 1:
+                    park_time_minutes = "0" + str(park_time_minutes)
+                else:
+                    park_time_minutes = str(park_time_minutes)
                 return park_time_hours, park_time_minutes
-        
+def clear_terminal():
+    if (platform.system() == "Linux"):
+        os.system('clear')
+    elif (platform.system() == "Windows"):
+        os.system('cls')

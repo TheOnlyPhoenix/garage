@@ -1,6 +1,5 @@
 """Main file in the program.
 """
-
 import sys
 import os
 import platform
@@ -9,9 +8,60 @@ from garage import Garage
 from typed_input import *
 from collections import defaultdict
 from itertools import chain
+from PyQt6 import QtCore, QtGui
+from PyQt6.QtWidgets import (
+    QApplication,
+    QCheckBox,
+    QComboBox,
+    QDateEdit,
+    QDateTimeEdit,
+    QDial,
+    QDoubleSpinBox,
+    QFontComboBox,
+    QLabel,
+    QLCDNumber,
+    QLineEdit,
+    QMainWindow,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QSlider,
+    QSpinBox,
+    QTimeEdit,
+    QVBoxLayout,
+    QWidget,
+)
             
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.setObjectName("Garage")
+        self.setWindowTitle("Garage")
+        self.setFixedSize(QtCore.QSize(400, 300))
+        label = QLabel("Hello, World!", parent=self)
+        label.setText("Hi")
+        font = label.font()
+        font.setPointSize(30)
+        label.setFont(font)
+        label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        self.setCentralWidget(label)
+        # self.label.setObjectName("label")
+
+        button = QPushButton("press.")
+        button.setFixedSize(QtCore.QSize(100, 50))
+        self.setCentralWidget(button)
+        button.pressed.connect(self.close)
+
+# Create the app, the main window, and run the app
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+app.exec()
+
 def write_history_file(garage):
-    """Function that extracts car info and times from various dictionaries in the program, and writes them to two separate files. One file is decided by the user, the other is decided by the program."""
+    """Function that extracts car info and times from various dictionaries in the program, 
+    and writes them to two separate files. One file is decided by the user, the other is decided by the program.
+    """
     history_file = "history.csv"
     entry_list = []
     exit_list = []
@@ -24,25 +74,24 @@ def write_history_file(garage):
             car = garage.parked_dict[num_to_check]
         e = True
         lines = re.sub(r"[\([{})\]]", "", repr(car).strip()).split("\n")
-        del lines[len(lines) - 2]
         file.write(",".join(lines) + "\n")
         
-        for value in garage.entry_dict[car.license_num]:
-            entry_list.append(value)
-        for value in garage.exit_dict[car.license_num]:
-            exit_list.append(value)   
+        entry_list = list(garage.entry_dict[car.license_num])
+        exit_list = list(garage.exit_dict[car.license_num]) 
         while e == True:
             file2.write(car.license_num + ",")
             e = False
         for i in range(len(entry_list)):
             line1 = re.sub(r"[\([{})\]]", "", entry_list[i])
             line2 = re.sub(r"[\([{})\]]", "", exit_list[i])
-            print(lines)
-            file2.write(",".join([line1,line2]))
+            joined_lines = ",".join([line1,line2]) + ","
+            file2.write(joined_lines)
         file2.write("\n")
             
 def read_from_file(garage):   
-    """Function"""
+    """Function that reads data from the file specified by the user 
+    and one file that is permanently specified by the program
+    """
     license_num = ""
     file = input_file("Which file do you want to load from (.csv)? ", "r")
     try:
@@ -52,14 +101,12 @@ def read_from_file(garage):
     
     lines = file.readlines()
     for line in lines:
-        split_line = line.split(",")
+        split_line = line.split(",").strip()
         license_num = split_line[0][len("License number: "):]
         size = split_line[1][len("Size: "):]
         owner = split_line[2][len("Owner: "):]
-        park_time = split_line[3][len("Park time: "):]
-        exit_time = split_line[4][len("Exit time: "):]
-        debt = split_line[5][len("Debt: "):].strip()
-        car = Car(license_num, size, owner, park_time, exit_time, debt)
+        debt = split_line[3][len("Debt: "):]
+        car = Car(license_num, size, owner, debt)
         garage.parked_dict.update({license_num : car})
     
     time_lines = file2.readlines()
@@ -75,24 +122,25 @@ def read_from_file(garage):
     return garage
 
 def view_history(garage, num):
+    """Shows the user the parking history and dates of a specific car"""
     for entry_combo, exit_time in zip(garage.entry_dict[num], garage.exit_dict[num]):
-        print(garage.entry_dict[num])
-        print(garage.exit_dict[num])
-        input(entry_combo)
         day,entry_time = entry_combo.split(";")
         
-        message = "Day parked: " + day + "\nEntry time: " + entry_time + "\nExit time :" + exit_time
+        message = "Day parked: " + day + "\nEntry time: " + entry_time + "\nExit time: " + exit_time
         print(message)
-        
+        input("Press enter to see the next time") #ändra så att den körs bara när det finns en till efter
+            
 
 def clear_terminal():
+    """Function that clears the terminal"""
     if (platform.system() == "Linux"):
         os.system('clear')
     elif (platform.system() == "Windows"):
         os.system('cls')
 
 def menu(garage):
-    day = str(input_type("What day of the month is it? ", int))
+    """Menu function that """
+    date = input_date("Enter the date (YYYY-MM-DD) ")
     print("Welcome to the parking garage! Please choose one of the options below:")
 
     while True:
@@ -108,7 +156,7 @@ def menu(garage):
         answer = input()
         match answer:
             case "1":
-                garage.append_to_dict(day)
+                garage.append_to_dict(date)
                 input("Press Enter to go back")
             case "2":
                 license_num = license_input("Enter the license number of the car (ABC123): \n")
@@ -146,63 +194,24 @@ def menu(garage):
             case "5":
                 garage = read_from_file(garage)
             case "6":
-                write_history_file(garage, day)
+                write_history_file(garage)
                 exit()
 
 def main():
     garage = Garage()
-    day_list = []
-    
+        
     menu(garage)
-    
 
-    
+def input_date(message : str):
+    """Asks the user to input a date in the form YYYY-MM-DD. If the program cannot match the time to the regex ('^\d{4}-\d{2}-\d{2}$'), it will ask the user again"""
+    while True:
+        user_input = input(message)
+        if (re.match(r'^\d{4}-\d{2}-\d{2}$', user_input)):
+            return user_input
+        else: 
+            print("You did not enter a date in the form YYYY-MM-DD. Please try again")
 
 if __name__ == '__main__':
     main()
 
 
-"""from PyQt6 import QtCore, QtGui
-from PyQt6.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QComboBox,
-    QDateEdit,
-    QDateTimeEdit,
-    QDial,
-    QDoubleSpinBox,
-    QFontComboBox,
-    QLabel,
-    QLCDNumber,
-    QLineEdit,
-    QMainWindow,
-    QProgressBar,
-    QPushButton,
-    QRadioButton,
-    QSlider,
-    QSpinBox,
-    QTimeEdit,
-    QVBoxLayout,
-    QWidget,
-)
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setObjectName("Garage")
-        self.setWindowTitle("Garage")
-        #self.centralwidget(QtWidgets.QWidget(parent=self))
-        self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.label.setObjectName("label")
-
-        self.setFixedSize(QtCore.QSize(400, 300))
-        button = QPushButton("press.")
-        button.setFixedSize(QtCore.QSize(100, 50))
-        self.setCentralWidget(button)
-        button.pressed.connect(self.close)
-
-# Create the app, the main window, and run the app
-app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-app.exec()"""
