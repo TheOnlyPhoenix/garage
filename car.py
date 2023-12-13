@@ -12,6 +12,20 @@ class Car():
         self.park_time = park_time
         self.debt = debt
     
+    def pay_debt(self):
+        choice = input(f"Your total debt is {self.debt}. Do you wish to pay it now? (Yes/No)")
+        match choice:
+            case "Yes":
+                amount = input_type("How much do you wish to pay?", int)
+                self.debt = self.debt - amount
+                self.park_time = ""
+                print(f"Thank you for paying! Your remaining debt is {self.debt}")
+            case "No":
+                print("Okay. Beware of dangers on the roads :)")
+            case _:
+                print("You did not enter a valid answer. Please try again.")
+                self.pay_debt()
+        clear_terminal()
     def __repr__(self):
         str_license = "License number: " + self.license_num + "\n"
         str_size = "Size: " + str(self.size) + "\n"
@@ -43,20 +57,6 @@ class Car():
         input("Press Enter to go back")
         clear_terminal()
         
-    def pay_debt(self):
-        choice = input(f"Your total debt is {self.debt}. Do you wish to pay it now? (Yes/No)")
-        match choice:
-            case "Yes":
-                amount = input_type("How much do you wish to pay?", int)
-                self.debt = self.debt - amount
-                self.park_time = ""
-                print(f"Thank you for paying! Your remaining debt is {self.debt}")
-            case "No":
-                print("Okay. Beware of dangers on the roads :)")
-            case _:
-                print("You did not enter a valid answer. Please try again.")
-                self.pay_debt()
-        clear_terminal()
 
     def calc_debt(self, entry, exit, single_list_bool):
         if single_list_bool == False:

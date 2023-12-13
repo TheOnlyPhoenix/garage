@@ -8,55 +8,6 @@ from garage import Garage
 from typed_input import *
 from collections import defaultdict
 from itertools import chain
-from PyQt6 import QtCore, QtGui
-from PyQt6.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QComboBox,
-    QDateEdit,
-    QDateTimeEdit,
-    QDial,
-    QDoubleSpinBox,
-    QFontComboBox,
-    QLabel,
-    QLCDNumber,
-    QLineEdit,
-    QMainWindow,
-    QProgressBar,
-    QPushButton,
-    QRadioButton,
-    QSlider,
-    QSpinBox,
-    QTimeEdit,
-    QVBoxLayout,
-    QWidget,
-)
-            
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        self.setObjectName("Garage")
-        self.setWindowTitle("Garage")
-        self.setFixedSize(QtCore.QSize(400, 300))
-        label = QLabel("Hello, World!", parent=self)
-        label.setText("Hi")
-        font = label.font()
-        font.setPointSize(30)
-        label.setFont(font)
-        label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
-        self.setCentralWidget(label)
-        # self.label.setObjectName("label")
-
-        button = QPushButton("press.")
-        button.setFixedSize(QtCore.QSize(100, 50))
-        self.setCentralWidget(button)
-        button.pressed.connect(self.close)
-
-# Create the app, the main window, and run the app
-app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-app.exec()
 
 def write_history_file(garage):
     """Function that extracts car info and times from various dictionaries in the program, 
@@ -139,7 +90,7 @@ def clear_terminal():
         os.system('cls')
 
 def menu(garage):
-    """Menu function that """
+    """Menu function that takes in a date and handles the navigation through the program."""
     date = input_date("Enter the date (YYYY-MM-DD) ")
     print("Welcome to the parking garage! Please choose one of the options below:")
 
