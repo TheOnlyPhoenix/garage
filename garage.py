@@ -99,5 +99,9 @@ class Garage:
                 print("The parking time exceeds 24 hours. Please enter a valid time.")
                 entry_time = time_input("Which time did you enter the garage? (HH:MM)")
                 exit_time = time_input("Which time did you exit the garage? (HH:MM) ")
+            elif entry_time_minutes > exit_time_minutes:
+                print("You cannot park past midnight. Please enter a valid time.")
+                entry_time = time_input("Which time did you enter the garage? (HH:MM)")
+                exit_time = time_input("Which time did you exit the garage? (HH:MM) ")
             else:
                 return return_entry, return_exit
