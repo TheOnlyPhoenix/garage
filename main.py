@@ -52,11 +52,12 @@ def read_from_file(garage):
     
     lines = file.readlines()
     for line in lines:
-        split_line = line.split(",").strip()
+        input(line)
+        split_line = line.split(",")
         license_num = split_line[0][len("License number: "):]
         size = split_line[1][len("Size: "):]
         owner = split_line[2][len("Owner: "):]
-        debt = split_line[3][len("Debt: "):]
+        debt = split_line[3][len("Debt: "):].strip()
         car = Car(license_num, size, owner, debt)
         garage.parked_dict.update({license_num : car})
     
@@ -127,21 +128,16 @@ def menu(garage):
                 input("Press Enter to go back")
             case "4":
                 license_num = license_input("Enter the license number of the car (ABC123): \n")
-                car = garage.parked_dict.get(license_num)
                 while True:
-                    input(list(garage.parked_dict))
                     if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
                         car = garage.parked_dict.get(license_num)
                         car.account(garage.entry_dict, garage.exit_dict)
                         break
+                    
                     else:
-                        if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
-                            car = garage.parked_dict.get(license_num)
-                            car.account(garage.entry_dict, garage.exit_dict)
-                            break
-                        else:
-                            print("Your car isn't currently parked and has never been parked in the garage. Please try again.")
-                            continue
+                        print("Your car isn't currently parked and has never been parked in the garage. Please try again.")
+                        license_num = license_input("Enter the license number of the car (ABC123): \n")
+                        continue
             case "5":
                 garage = read_from_file(garage)
             case "6":
