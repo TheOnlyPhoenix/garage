@@ -10,14 +10,7 @@ def input_type(user_input, convert_type = str):
         except:
             print(f"That was not of the type {convert_type.__name__}. Please enter again")
 
-def license_input(user_input : str):
-    """Asks the user for input. If the program is unable to match a regular expression to '^[A-Z]{3}\d{3}$', the program will ask the user again.
-    """
-    while True:
-        if (re.match(r'^[A-Z]{3}\d{3}$', user_input)):
-            return user_input
-        else:
-            print(f"You did not enter a valid license number (ABC123). Please try again")
+
 
 def exit_input(user_input : str, parking_list : dict):
     """Asks the user for input. If the program is unable to match a regular expression to '^[A-Z]{3}\d{3}$' and find the input in a list, the program will ask the user again.

@@ -9,40 +9,40 @@ class Garage:
         self.entry_dict = defaultdict(list)
         self.exit_dict = defaultdict(list)
     
-    def park(self, date):    
-        print("Note: You can only park from 00:00 until 23:59, and for a maximum of 24 Hours")
-        status = input_type("Have you been parked before? (Yes/No) ", str)
-        while True:
-            if (status == "Yes"):
-                license_num = license_input("Enter the license number of the car (ABC123): ")
-                entry_time = time_input("Which time did you enter the garage? (HH:MM) ")
-                exit_time = time_input("Which time did you exit the garage? (HH:MM) ")
-                entry_time, exit_time = self.check_times(entry_time, exit_time)
-                if (license_num in self.parked_dict):
-                    car = self.parked_dict[license_num]
-                    date_and_entry_time = date + ";" + entry_time
-                    self.entry_dict[license_num].append(date_and_entry_time)
-                    self.exit_dict[license_num].append(exit_time)
-                    return car, entry_time, exit_time
-                else:
-                    print("The license number you entered has never been parked here. Please try again. ")
-                    continue
-            elif (status == "No"):
-                license_num = license_input("Enter the license number of the car (ABC123): ")
-                #size = size_input("Enter the size of the car (Small - 1 | Medium - 2 | Large - 3): ")
-                owner = input_type("Enter the name of the owner of the car: ", str)
-                entry_time = time_input("Which time did you enter the garage? (HH:MM) ")
-                exit_time = time_input("Which time did you exit the garage? (HH:MM) ")
-                entry_time, exit_time = self.check_times(entry_time, exit_time)
-                date_and_entry_time = date + ";" + entry_time
-                self.entry_dict[license_num].append(date_and_entry_time)
-                self.exit_dict[license_num].append(exit_time)
-                return Car(license_num, size, owner), entry_time, exit_time
-            else:
-                status = input("You did not enter \"Yes\" or \"No\". Please try again: ")
+    # def park(self, date):    
+    #     print("Note: You can only park from 00:00 until 23:59, and for a maximum of 24 Hours")
+    #     status = input_type("Have you been parked before? (Yes/No) ", str)
+    #     while True:
+    #         if (status == "Yes"):
+    #             license_num = license_input("Enter the license number of the car (ABC123): ")
+    #             entry_time = time_input("Which time did you enter the garage? (HH:MM) ")
+    #             exit_time = time_input("Which time did you exit the garage? (HH:MM) ")
+    #             entry_time, exit_time = self.check_times(entry_time, exit_time)
+    #             if (license_num in self.parked_dict):
+    #                 car = self.parked_dict[license_num]
+    #                 date_and_entry_time = date + ";" + entry_time
+    #                 self.entry_dict[license_num].append(date_and_entry_time)
+    #                 self.exit_dict[license_num].append(exit_time)
+    #                 return car, entry_time, exit_time
+    #             else:
+    #                 print("The license number you entered has never been parked here. Please try again. ")
+    #                 continue
+    #         elif (status == "No"):
+    #             license_num = license_input("Enter the license number of the car (ABC123): ")
+    #             #size = size_input("Enter the size of the car (Small - 1 | Medium - 2 | Large - 3): ")
+    #             owner = input_type("Enter the name of the owner of the car: ", str)
+    #             entry_time = time_input("Which time did you enter the garage? (HH:MM) ")
+    #             exit_time = time_input("Which time did you exit the garage? (HH:MM) ")
+    #             entry_time, exit_time = self.check_times(entry_time, exit_time)
+    #             date_and_entry_time = date + ";" + entry_time
+    #             self.entry_dict[license_num].append(date_and_entry_time)
+    #             self.exit_dict[license_num].append(exit_time)
+    #             return Car(license_num, 1, owner), entry_time, exit_time
+    #         else:
+    #             status = input("You did not enter \"Yes\" or \"No\". Please try again: ")
 
     def append_to_dict(self, num, entry_time, exit_time):    
-        car, entry_time, exit_time = self.park(date)
+        car, entry_time, exit_time = self.park(1)
         num = car.license_num
         self.parked_dict.update({num : car})
         park_hours, park_minutes = car.calc_debt(entry_time, exit_time, True)

@@ -89,60 +89,53 @@ def clear_terminal():
     elif (platform.system() == "Windows"):
         os.system('cls')
 
-def menu(garage):
-    """Menu function that takes in a date and handles the navigation through the program."""
+# def menu(garage):
+#     """Menu function that takes in a date and handles the navigation through the program."""
 
-    license_num = license_input("Enter the license number of the car (ABC123): \n")
-    if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
-        print(re.sub(r"[\([{})\]]", "", repr(garage.parked_dict.get(license_num))))
-    else:
-        print("There are currently no cars parked in the garage and your car has never been parked in the garage")  
+#     license_num = license_input("Enter the license number of the car (ABC123): \n")
+#     if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
+#         print(re.sub(r"[\([{})\]]", "", repr(garage.parked_dict.get(license_num))))
+#     else:
+#         print("There are currently no cars parked in the garage and your car has never been parked in the garage")  
     
-    input("Press Enter to go back")
+#     input("Press Enter to go back")
 
-    license_num = license_input("Enter the license number of the car (ABC123): \n")
-    if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
-        view_history(garage, license_num)
-    else:
-        print("There are currently no cars parked in the garage and your car has never been parked in the garage")  
+#     license_num = license_input("Enter the license number of the car (ABC123): \n")
+#     if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
+#         view_history(garage, license_num)
+#     else:
+#         print("There are currently no cars parked in the garage and your car has never been parked in the garage")  
     
-    input("Press Enter to go back")
+#     input("Press Enter to go back")
 
-    license_num = license_input("Enter the license number of the car (ABC123): \n")
-    car = garage.parked_dict.get(license_num)
-    while True:
-        input(list(garage.parked_dict))
-        if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
-            car = garage.parked_dict.get(license_num)
-            car.account(garage.entry_dict, garage.exit_dict)
-            break
-        else:
-            if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
-                car = garage.parked_dict.get(license_num)
-                car.account(garage.entry_dict, garage.exit_dict)
-                break
-            else:
-                print("Your car isn't currently parked and has never been parked in the garage. Please try again.")
-                continue
+#     license_num = license_input("Enter the license number of the car (ABC123): \n")
+#     car = garage.parked_dict.get(license_num)
+#     while True:
+#         input(list(garage.parked_dict))
+#         if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
+#             car = garage.parked_dict.get(license_num)
+#             car.account(garage.entry_dict, garage.exit_dict)
+#             break
+#         else:
+#             if (len(list(garage.parked_dict)) > 0 and license_num in garage.parked_dict):
+#                 car = garage.parked_dict.get(license_num)
+#                 car.account(garage.entry_dict, garage.exit_dict)
+#                 break
+#             else:
+#                 print("Your car isn't currently parked and has never been parked in the garage. Please try again.")
+#                 continue
 
-    garage = read_from_file(garage)
+#     garage = read_from_file(garage)
 
-    write_history_file(garage)
-    exit()
+#     write_history_file(garage)
+#     exit()
 
 def main():
     garage = Garage()
         
-    menu(garage)
+    #menu(garage)
 
-def input_date(message : str):
-    """Asks the user to input a date in the form YYYY-MM-DD. If the program cannot match the time to the regex ('^\d{4}-\d{2}-\d{2}$'), it will ask the user again"""
-    while True:
-        user_input = input(message)
-        if (re.match(r'^\d{4}-\d{2}-\d{2}$', user_input)):
-            return user_input
-        else: 
-            print("You did not enter a date in the form YYYY-MM-DD. Please try again")
+            
 
 
 

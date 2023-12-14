@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
     QMainWindow,
     QPushButton,
     QStackedWidget,
+    QStatusBar,
     QVBoxLayout,
     QWidget,
 )
@@ -180,7 +181,9 @@ class Ui_MainWindow(object):
         
         MainWindow.setObjectName("mainwindow")
         MainWindow.setWindowTitle("QMainWindow")
-        MainWindow.setMinimumSize(270, 230)
+        MainWindow.setMinimumSize(270, 240)
+        self.status_bar = QStatusBar(MainWindow)
+        MainWindow.setStatusBar(self.status_bar)
         self.central_widget = QWidget(MainWindow)
         self.central_widget.setObjectName("main_widget")
         self.stacked_widget = QStackedWidget(self.central_widget)
@@ -190,7 +193,7 @@ class Ui_MainWindow(object):
         self.date_layout = QVBoxLayout()
         self.date_line = QLineEdit(self.date)
         self.date_line.setPlaceholderText("Date (YYYY-MM-DD)")
-        self.date_layout.addWidget(self.date)
+        self.date_layout.addWidget(self.date_line)
         self.date_accept = QPushButton("Continue",self.date)
         self.date_layout.addWidget(self.date_accept)
         self.date.setLayout(self.date_layout)
@@ -206,12 +209,12 @@ class Ui_MainWindow(object):
         self.exit_button = QPushButton("Exit", self.menu)
 
         self.menu_layout.addWidget(QLabel("Parking Garage"))
-        self.menu_layout.addWidget(self.park_button, 0, 0)
-        self.menu_layout.addWidget(self.info_button, 1, 0)
-        self.menu_layout.addWidget(self.history_button, 2, 0)
-        self.menu_layout.addWidget(self.account_button, 3, 0)
-        self.menu_layout.addWidget(self.file_button, 4, 0)
-        self.menu_layout.addWidget(self.exit_button, 5, 0)
+        self.menu_layout.addWidget(self.park_button, 1, 0)
+        self.menu_layout.addWidget(self.info_button, 2, 0)
+        self.menu_layout.addWidget(self.history_button, 3, 0)
+        self.menu_layout.addWidget(self.account_button, 4, 0)
+        self.menu_layout.addWidget(self.file_button, 5, 0)
+        self.menu_layout.addWidget(self.exit_button, 6, 0)
 
         self.menu.setLayout(self.menu_layout)
         self.stacked_widget.addWidget(self.menu)
@@ -226,20 +229,20 @@ class Ui_MainWindow(object):
         self.park_size_box.setPlaceholderText("Choose size")
         
         self.park_license_widget.setPlaceholderText("License Number (ABC123)")
-        self.park_layout.addWidget(self.license_widget, 0, 0)
+        self.park_layout.addWidget(self.park_license_widget, 0, 0)
         
         size_layout = QHBoxLayout()
         self.park_size_box.addItems(["1 - Small", "2 - Medium", "3 - Large"])
         label = QLabel("Size of the car ")
         size_layout.addWidget(label)
-        size_layout.addWidget(self.combo_widget)
+        size_layout.addWidget(self.park_size_box)
         self.park_layout.addLayout(size_layout, 1, 0)
         self.park_owner.setPlaceholderText("Name of Owner")
-        self.park_layout.addWidget(self.owner_widget, 2, 0)
+        self.park_layout.addWidget(self.park_owner, 2, 0)
         self.park_entry_time.setPlaceholderText("Entry Time (HH:MM)")
-        self.park_layout.addWidget(self.entry_widget, 3, 0)
+        self.park_layout.addWidget(self.park_entry_time, 3, 0)
         self.park_exit_time.setPlaceholderText("Exit Time (HH:MM)")
-        self.park_layout.addWidget(self.exit_widget, 4, 0)
+        self.park_layout.addWidget(self.park_exit_time, 4, 0)
         self.park_buttons = QDialogButtonBox()
         self.park_buttons.setCenterButtons(True)
         self.park_button_ok = QDialogButtonBox.StandardButton.Ok
@@ -355,7 +358,7 @@ class Ui_MainWindow(object):
         
         ##################################################################
         MainWindow.setCentralWidget(self.central_widget)
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(0)
         
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
     def load_file(self):
@@ -371,31 +374,67 @@ class ControlMainWindow(QMainWindow):
         self.ui.setup_Ui(self)
         self.garage = Garage()
         
-        self.ui.park_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(2))
-        self.ui.info_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(3))
-        self.ui.history_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(4))
-        self.ui.account_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(5))
-        self.ui.file_button.clicked.connect(self.ui.LoadFile)
+        # Change menu page
+        self.ui.park_button.clicked.connect(self.park_menu)
+        self.ui.info_button.clicked.connect(self.info_menu)
+        self.ui.history_button.clicked.connect(self.history_menu)
+        self.ui.account_button.clicked.connect(self.account_menu)
+        self.ui.file_button.clicked.connect(self.ui.load_file)
         self.ui.exit_button.clicked.connect(self.close)
 
-        self.ui.park_buttons.button(self.ui.park_button_cancel).clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(0))
         
-        self.ui.info_back_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(0))
-        self.ui.history_back_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(0))
-        self.ui.account_back_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(0))
+        self.ui.park_buttons.button(self.ui.park_button_cancel).clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(1))
+        self.ui.info_back_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(1))
+        self.ui.history_back_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(1))
+        self.ui.account_back_button.clicked.connect(lambda: self.ui.stacked_widget.setCurrentIndex(1))
 
-        self.ui.date_accept.clicked.connect(self.garage.append_to_dict(self.ui.date_line.text))
+        self.ui.date_accept.clicked.connect(self.check_date)
         
-        self.ui.park_buttons.button(self.ui.park_button_ok).clicked.connect(lambda: self.get_car_input)
+        #self.ui.park_buttons.button(self.ui.park_button_ok).clicked.connect(lambda: self.get_car_input)
         
+    def park_menu(self):
+        self.ui.stacked_widget.setCurrentIndex(2)
+        
+    def info_menu(self):
+        self.ui.stacked_widget.setCurrentIndex(3)
+        
+    def history_menu(self):
+        self.ui.stacked_widget.setCurrentIndex(4)
+        
+    def account_menu(self):
+        self.ui.stacked_widget.setCurrentIndex(5)
+        
+    def check_date(self, go):
+        self.date_input = str(self.ui.date_line.text())
+        
+        if (re.match(r'^\d{4}-\d{2}-\d{2}$', self.date_input)):
+            self.ui.stacked_widget.setCurrentIndex(1)
+            self.ui.status_bar.clearMessage()
+        else: 
+            self.error_msg("\'Date\'")
+            
+
+    def error_msg(self, e):
+        self.ui.status_bar.showMessage(f"Invalid {e} input", 0)
+
         
     def get_car_input(self):
+        self.ui.park_license_widget.editingFinished(lambda: self.license_input(self.ui.park_license_widget.text()))
         
-        num = license_input(self.ui.park_license_widget.text)
         size = self.ui.park_size_box.currentIndex + 1
-        owner = input_type(self.ui.park_owner.text, str)
-        entry_time = time_input(self.ui.park_entry_time.text)
-        exit_time = time_input(self.ui.park_exit_time.text)
+        owner = input_type(self.ui.park_owner.text(), str)
+        entry_time = time_input(self.ui.park_entry_time.text())
+        exit_time = time_input(self.ui.park_exit_time.text())
+        
+        #self.garage.append_to_dict
+    
+    def license_input(self, user_input : str):
+        """Asks the user for input. If the program is unable to match a regular expression to '^[A-Z]{3}\d{3}$', the program will ask the user again.
+        """
+        if (re.match(r'^[A-Z]{3}\d{3}$', user_input)):
+            self.license_num = user_input
+        else:
+            self.error_msg("\'License Number\'")
 def main():
     garage_app = QApplication(sys.argv)
     garage_window = ControlMainWindow()
